@@ -15,6 +15,7 @@ class ofApp : public ofBaseApp
 		void setup();
 		void update();
 		void draw();
+		void setNormals(ofMesh &mesh);
 
 		void keyPressed(int key);
 	
