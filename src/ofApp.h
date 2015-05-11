@@ -16,12 +16,18 @@ class ofApp : public ofBaseApp
 		void update();
 		void draw();
 		void setNormals(ofMesh &mesh);
-
 		void keyPressed(int key);
+    
+    
+    
+        ofMesh mesh;
+        ofLight light;
+        int width = 31;
+        int height = 31;
+        int depth = 31;
 	
 		ofxFirstPersonCamera	camera;
-	
-		ofTrueTypeFontExt		fontSmall;
     
-    ofMesh mesh;
+        ofTrueTypeFontExt		fontSmall;
+    
 };

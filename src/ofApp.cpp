@@ -4,50 +4,96 @@
 //
 void ofApp::setup()
 {
-	fontSmall.loadFont("Fonts/DIN.otf", 8 );
-	
-	// Give us a starting point for the camera
-	camera.setNearClip(0.01f);
-	camera.setPosition( 0, 4, 10 );
-	camera.setMovementMaxSpeed( 0.1f );
+    fontSmall.loadFont("Fonts/DIN.otf", 8 );
     
-	
+    //Set the camera to view the plain a an angle.
+    camera.setNearClip(0.01f);
+    camera.setPosition( 10, 40, 50 );
+    camera.lookAt( ofVec3f( 0, 0, 0 ));
+    camera.setMovementMaxSpeed( 1 );
+    
+    //Adds the vertexs for the mesh and initiates the color.
+    for (int y=0; y<height; y++) {
+        for (int x=0; x<width; x++) {
+            mesh.addVertex(
+                           ofPoint( (x - width/2), (y - height/2), 0 ) );
+            mesh.addColor( ofColor( 0, 0, 0 ) );
+        }
+    }
+    
+    //Draws the triangles onto the mesh.
+    for (int y=0; y<height-1; y++) {
+        for (int x=0; x<width-1; x++) {
+            int i1 = x + width * y;
+            int i2 = x+1 + width * y;
+            int i3 = x + width * (y+1);
+            int i4 = x+1 + width * (y+1);
+            mesh.addTriangle( i1, i2, i3 );
+            mesh.addTriangle( i2, i4, i3 );
+        }
+    }
+    
+    float time = ofGetElapsedTimef();
+
+    //Changes the plane according to perlin noise applied to the y value of each vertex.
+    for (int y=0; y<height; y++) {
+        for (int x=0; x<width; x++) {
+            int i = x + width * y;
+            ofPoint p = mesh.getVertex( i );
+            
+            float value = ofNoise( x * 1, y * 15, time * 0.5 );
+            
+            p.z = value * 15;
+            mesh.setVertex( i, p );
+            
+            mesh.setColor( i,
+                            ofColor( (value*y)*101,(value*y)*400,(value*y)*5) );
+    
+        }
+    }
+    
+    setNormals( mesh );
+    light.enable();
 }
 
 //-----------------------------------------------------------------------------------------
 //
 void ofApp::update()
 {
+    setNormals( mesh );
+    
 }
 
 //-----------------------------------------------------------------------------------------
 //
 void ofApp::draw()
 {
-	ofBackgroundGradient( ofColor(40,40,40), ofColor(0,0,0), OF_GRADIENT_CIRCULAR);	
-	
-	ofEnableDepthTest();
-	
-	camera.begin();
-	
-		// draw a grid on the floor
-		ofSetColor( ofColor(60) );
-		ofPushMatrix();
-			ofRotate(90, 0, 0, -1);
-			ofDrawGridPlane( 10 );
-		ofPopMatrix();
+    ofBackgroundGradient( ofColor(0,0,80), ofColor(0,0,0), OF_GRADIENT_CIRCULAR);
+    
+    ofEnableDepthTest();
+    
+    camera.begin();
+    
+    //Draws the floor grid below the landscape.
+    ofSetColor( ofColor(60) );
+    ofPushMatrix();
+    ofRotate(90, 0, 0, -1);
+    ofDrawGridPlane( 15, 15, false);
+    ofPopMatrix();
+    
+    //Draws and rotates the landscape.
+    ofPushMatrix();
+    ofRotate( 90, -1, 0, 0 );
+    ofTranslate(0, 0, -2.5);
     mesh.draw();
-	
-	camera.end();
-
-	ofSetColor( ofColor::white );
-	ofDisableDepthTest();
-
-
-	fontSmall.drawStringShadowed(ofToString(ofGetFrameRate(),2), ofGetWidth()-35, ofGetHeight() - 6, ofColor::whiteSmoke, ofColor::black );
+    ofPopMatrix();
+    
+    camera.end();
+    
+    ofDisableDepthTest();
 }
 
-//-----------------------------------------------------------------------------------------//
+//--------------------------------------------------------------
 //Universal function which sets normals for the triangle mesh
 void ofApp::setNormals( ofMesh &mesh ){
     
@@ -92,14 +138,12 @@ void ofApp::setNormals( ofMesh &mesh ){
     mesh.addNormals( norm );
 }
 
-
-
-
-
+//-----------------------------------------------------------------------------------------
+//
 void ofApp::keyPressed(int key)
 {
-	if( key == 'f' )
-	{
-		ofToggleFullscreen();
-	}
+    if( key == 'f' )
+    {
+        ofToggleFullscreen();
+    }
 }
