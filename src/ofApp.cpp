@@ -41,7 +41,7 @@ void ofApp::setup()
             int i = x + width * y;
             ofPoint p = mesh.getVertex( i );
             
-            float value = ofNoise( x * 1, y * 15, time * 0.5 );
+            float value = ofNoise( x * 1, y * 100, time * 0.5 );
             
             p.z = value * 15;
             mesh.setVertex( i, p );
